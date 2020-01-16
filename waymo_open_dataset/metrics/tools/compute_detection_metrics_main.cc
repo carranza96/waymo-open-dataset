@@ -188,6 +188,16 @@ void Compute(const std::string& pd_str, const std::string& gt_str) {
   std::cout << "\n";
   for (int i = 0; i < detection_metrics.size(); ++i) {
     const DetectionMetrics& metric = detection_metrics[i];
+//    const auto* measurements = metric.measurements().measurements();
+    for(DetectionMeasurement x: metric.measurements().measurements()){
+        const int tp_fp_sum = x.num_tps() + x.num_fps();
+        const float precision = static_cast<float>(x.num_tps()) / tp_fp_sum;
+        const int tp_fn_sum = x.num_tps() + x.num_fns();
+        const float recall = static_cast<float>(x.num_tps()) /tp_fn_sum;
+        std::cout << "Score cutoff " << x.score_cutoff() << ", FPS: " << x.num_fps() << " , TPS:" << x.num_tps() <<
+        " , FNS:" << x.num_fns() << " , Precision " << precision << ", Recall: " << recall << "\n";
+//        break;
+    }
     std::cout << breakdown_names[i] << ": [mAP "
               << metric.mean_average_precision() << "]"
               << " [mAPH " << metric.mean_average_precision_ha_weighted()
