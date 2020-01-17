@@ -194,8 +194,8 @@ void Compute(const std::string& pd_str, const std::string& gt_str) {
         const float precision = static_cast<float>(x.num_tps()) / tp_fp_sum;
         const int tp_fn_sum = x.num_tps() + x.num_fns();
         const float recall = static_cast<float>(x.num_tps()) /tp_fn_sum;
-        std::cout << "Score cutoff " << x.score_cutoff() << ", FPS: " << x.num_fps() << " , TPS:" << x.num_tps() <<
-        " , FNS:" << x.num_fns() << " , Precision " << precision << ", Recall: " << recall << "\n";
+//        std::cout << "Score cutoff " << x.score_cutoff() << ", FPS: " << x.num_fps() << " , TPS:" << x.num_tps() <<
+//        " , FNS:" << x.num_fns() << " , Precision " << precision << ", Recall: " << recall << "\n";
 //        break;
     }
     std::cout << breakdown_names[i] << ": [mAP "
