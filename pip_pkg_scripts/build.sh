@@ -34,23 +34,23 @@ else
   PYTHON="python${PYTHON_VERSION}.${PYTHON_MINOR_VERSION}"
 fi
 
-curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-$PYTHON get-pip.py --user
-
-PIP="$PYTHON -m pip"
-
-${PIP} install --upgrade setuptools --user
-${PIP} install tensorflow-gpu=="${TF_VERSION}" --user
-# Hack. Bazel python runtime is not configured. We need to
-# install tensorflow in order to run TF related python tests in
-# bazel.
-python3 -m pip install --upgrade tensorflow-gpu=="${TF_VERSION}" --user
-
-rm -rf waymo-od || true
-git clone https://github.com/waymo-research/waymo-open-dataset.git waymo-od
-cd waymo-od
-
-git checkout remotes/origin/${GITHUB_BRANCH}
+#curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+#$PYTHON get-pip.py --user
+#
+#PIP="$PYTHON -m pip"
+#
+#${PIP} install --upgrade setuptools --user
+#${PIP} install tensorflow-gpu=="${TF_VERSION}" --user
+## Hack. Bazel python runtime is not configured. We need to
+## install tensorflow in order to run TF related python tests in
+## bazel.
+#python3 -m pip install --upgrade tensorflow-gpu=="${TF_VERSION}" --user
+#
+#rm -rf waymo-od || true
+#git clone https://github.com/waymo-research/waymo-open-dataset.git waymo-od
+#cd waymo-od
+#
+#git checkout remotes/origin/${GITHUB_BRANCH}
 
 ./configure.sh
 
