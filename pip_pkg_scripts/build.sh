@@ -26,7 +26,7 @@ export GITHUB_BRANCH="${GITHUB_BRANCH:-master}"
 export PYTHON_VERSION="${PYTHON_VERSION:-3}"
 export PYTHON_MINOR_VERSION="${PYTHON_MINOR_VERSION}"
 export PIP_MANYLINUX2010="${PIP_MANYLINUX2010:-0}"
-export TF_VERSION="${TF_VERSION:-1.15.0}"
+export TF_VERSION="${TF_VERSION:-1.14.0}"
 
 if [[ -z "${PYTHON_MINOR_VERSION}" ]]; then
   PYTHON="python${PYTHON_VERSION}"
@@ -56,7 +56,7 @@ fi
 
 bazel clean
 bazel build ...
-bazel test ...
+bazel test ... --jobs 1
 
 DST_DIR="/tmp/pip_pkg_build"
 rm -rf "$DST_DIR" || true
