@@ -83,14 +83,15 @@ Config GetConfig() {
   auto* d1 = config.add_difficulties();
   d1->add_levels(Label::LEVEL_1);
   d1->add_levels(Label::LEVEL_2);
+  config.add_breakdown_generator_ids(Breakdown::ALL_BUT_SIGN);
+  auto* d3 = config.add_difficulties();
+  d3->add_levels(Label::LEVEL_1);
+  d3->add_levels(Label::LEVEL_2);
   config.add_breakdown_generator_ids(Breakdown::OBJECT_TYPE);
   auto* d2 = config.add_difficulties();
   d2->add_levels(Label::LEVEL_1);
   d2->add_levels(Label::LEVEL_2);
-//  config.add_breakdown_generator_ids(Breakdown::ALL_BUT_SIGN);
-//  auto* d3 = config.add_difficulties();
-//  d3->add_levels(Label::LEVEL_1);
-//  d3->add_levels(Label::LEVEL_2);
+
 //  config.add_breakdown_generator_ids(Breakdown::RANGE);
 //  d = config.add_difficulties();
 //  d->add_levels(Label::LEVEL_1);
@@ -102,7 +103,7 @@ Config GetConfig() {
   config.add_iou_thresholds(0.5);
   config.add_iou_thresholds(0.5);
   config.add_iou_thresholds(0.5);
-  config.set_box_type(Label::Box::TYPE_AA_2D);
+  config.set_box_type(Label::Box::TYPE_2D);
 
   for (int i = 0; i < 100; ++i) {
     config.add_score_cutoffs(i * 0.01);
@@ -197,15 +198,15 @@ void Compute(const std::string& pd_str, const std::string& gt_str) {
   for (int i = 0; i < detection_metrics.size(); ++i) {
     const DetectionMetrics& metric = detection_metrics[i];
 //    const auto* measurements = metric.measurements().measurements();
-    for(DetectionMeasurement x: metric.measurements().measurements()){
-        const int tp_fp_sum = x.num_tps() + x.num_fps();
-        const float precision = static_cast<float>(x.num_tps()) / tp_fp_sum;
-        const int tp_fn_sum = x.num_tps() + x.num_fns();
-        const float recall = static_cast<float>(x.num_tps()) /tp_fn_sum;
+//    for(DetectionMeasurement x: metric.measurements().measurements()){
+//        const int tp_fp_sum = x.num_tps() + x.num_fps();
+//        const float precision = static_cast<float>(x.num_tps()) / tp_fp_sum;
+//        const int tp_fn_sum = x.num_tps() + x.num_fns();
+//        const float recall = static_cast<float>(x.num_tps()) /tp_fn_sum;
 //        std::cout << "Score cutoff " << x.score_cutoff() << ", FPS: " << x.num_fps() << " , TPS:" << x.num_tps() <<
 //        " , FNS:" << x.num_fns() << " , Precision " << precision << ", Recall: " << recall << "\n";
 //        break;
-    }
+//    }
     std::cout << breakdown_names[i] << ": [mAP "
               << metric.mean_average_precision() << "]"
               << " [mAPH " << metric.mean_average_precision_ha_weighted()
