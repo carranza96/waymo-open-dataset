@@ -4,7 +4,7 @@ This Quick Start contains installation instructions for the Open Dataset codebas
 
 ## System Requirements
 * g++ 5 or higher.
-* TensorFlow 1.14.0, 1.15.0, 2.0.0
+* TensorFlow 1.15.0, 2.0.0, 2.1.0
 
 The code has two main parts. One is a utility written in C++ to compute the evaluation metrics. The other part is a set of [TensorFlow](https://www.tensorflow.org/) functions in Python to help with model training.
 
@@ -27,8 +27,7 @@ sudo bash bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh
 sudo apt install build-essential
 ```
 
-Configure .bazelrc. This command may output some warnings due to the differences
-between Python 2 and Python 3, which you may safely ignore.
+Configure .bazelrc.
 ```
 ./configure.sh
 ```
@@ -97,12 +96,17 @@ bazel test waymo_open_dataset/utils/...
 ```
 
 ## Use pre-compiled pip/pip3 packages
-We only pre-compiled the package for Python 3.5, 3.6, 3.7. If you need the
+We only pre-compiled the package for Python 3.6, 3.7. If you need the
 lib for a different python version, follow steps in pip_pkg_scripts to build pip
 package on your own.
 ``` bash
 pip3 install upgrade --pip
-pip install waymo-open-dataset-tf-2-0-0==1.0.1 --user
+# tf 2.1.0.
+pip3 install waymo-open-dataset-tf-2-1-0==1.2.0 --user
+# tf 2.0.0
+# pip3 install waymo-open-dataset-tf-2-0-0==1.2.0 --user
+# tf 1.15.0
+# pip3 install waymo-open-dataset-tf-1-15-0==1.2.0 --user
 ```
 
 ## Submit to leaderboard
@@ -110,6 +114,7 @@ pip install waymo-open-dataset-tf-2-0-0==1.0.1 --user
 1.  Run inference and dump the predictions in protos/metrics.proto:Objects
     format. Example code can be found in
     metrics/tools/create_submission.cc:example_code_to_create_a_prediction_file.
+    Or a python version in metrics/tools/create_prediction_file_example.py.
     Assume the file you created is in /tmp/preds.bin.
 
 2.  First modify metrics/tools/submission.txtpb to set the metadata information.
@@ -117,13 +122,23 @@ pip install waymo-open-dataset-tf-2-0-0==1.0.1 --user
     submission proto by adding more metadata submission information.
 
 ```bash
-metrics/tools/create_submission  --input_filenames='/tmp/preds.bin' --output_filename='/tmp/my_model' --submission_filename='metrics/tools/submission.txtpb'
+mkdir /tmp/my_model
+metrics/tools/create_submission  --input_filenames='/tmp/preds.bin' --output_filename='/tmp/my_model/model' --submission_filename='metrics/tools/submission.txtpb'
+```
+
+You can try a submission by running the following to the validation server. It
+should work. Make sure you change the fields in metrics/tools/submission.txtpb
+before running the command.
+
+```bash
+mkdir /tmp/my_model
+metrics/tools/create_submission  --input_filenames='metrics/tools/fake_predictions.bin' --output_filename='/tmp/my_model/model' --submission_filename='metrics/tools/submission.txtpb'
 ```
 
 3.  Tar and gzip the file.
 
 ```bash
-tar cvf /tmp/my_model.tar /tmp/my_model
+tar cvf /tmp/my_model.tar /tmp/my_model/
 gzip /tmp/my_model.tar
 ```
 
