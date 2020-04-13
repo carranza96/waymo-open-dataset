@@ -83,10 +83,10 @@ Config GetConfig() {
   auto* d1 = config.add_difficulties();
   d1->add_levels(Label::LEVEL_1);
   d1->add_levels(Label::LEVEL_2);
-  config.add_breakdown_generator_ids(Breakdown::ALL_BUT_SIGN);
-  auto* d3 = config.add_difficulties();
-  d3->add_levels(Label::LEVEL_1);
-  d3->add_levels(Label::LEVEL_2);
+//  config.add_breakdown_generator_ids(Breakdown::ALL_BUT_SIGN);
+//  auto* d3 = config.add_difficulties();
+//  d3->add_levels(Label::LEVEL_1);
+//  d3->add_levels(Label::LEVEL_2);
   config.add_breakdown_generator_ids(Breakdown::OBJECT_TYPE);
   auto* d2 = config.add_difficulties();
   d2->add_levels(Label::LEVEL_1);
