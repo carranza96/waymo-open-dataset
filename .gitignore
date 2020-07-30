@@ -1,0 +1,8 @@
+pip_pkg_scripts/
+.bazelrc
+bazel-bin
+bazel-genfiles
+bazel-out
+bazel-testlogs
+bazel-waymo-open-dataset
+WORKSPACE
