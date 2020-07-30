@@ -83,14 +83,16 @@ if [[ "$PIP_MANYLINUX2010" == "1" ]]; then
   write_to_bazelrc "test --config=manylinux2010"
 fi
 
-export TF_VERSION="${TF_VERSION:-1.14.0}"
+export TF_VERSION="${TF_VERSION:-1.15.0}"
 export TF_VERSION_UNDERSCORE=$(echo $TF_VERSION | sed 's/\./_/g')
 export TF_VERSION_DASH=$(echo $TF_VERSION | sed 's/\./-/g')
 
 cat WORKSPACE.in | sed "s/TF_VERSION/${TF_VERSION_UNDERSCORE}/" > WORKSPACE
 cat pip_pkg_scripts/setup.py.in | sed "s/TF_VERSION/${TF_VERSION_DASH}/" > pip_pkg_scripts/setup.py
 
-
-write_to_bazelrc 'build --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=1"'
-
+if [[ ${TF_VERSION} == '1.14.0' ]]; then
+  write_to_bazelrc 'build --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=1"'
+else
+  write_to_bazelrc 'build --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0"'
+fi
 
