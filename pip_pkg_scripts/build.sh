@@ -22,7 +22,6 @@
 set -e -x
 
 # Override the following env variables if necessary.
-export GITHUB_BRANCH="${GITHUB_BRANCH:-master}"
 export PYTHON_VERSION="${PYTHON_VERSION:-3}"
 export PYTHON_MINOR_VERSION="${PYTHON_MINOR_VERSION}"
 export PIP_MANYLINUX2010="${PIP_MANYLINUX2010:-0}"
@@ -40,7 +39,7 @@ bazel clean
 bazel build ...
 bazel test ... --jobs 1
 
-DST_DIR="/tmp/pip_pkg_build"
+DST_DIR="/tmp/artifacts"
 rm -rf "$DST_DIR" || true
 ./pip_pkg_scripts/build_pip_pkg.sh "$DST_DIR" ${PYTHON_VERSION}
 # Comment the following line if you run this outside of the container.
