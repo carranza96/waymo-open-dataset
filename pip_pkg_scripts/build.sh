@@ -25,7 +25,7 @@ set -e -x
 export PYTHON_VERSION="${PYTHON_VERSION:-3}"
 export PYTHON_MINOR_VERSION="${PYTHON_MINOR_VERSION}"
 export PIP_MANYLINUX2010="${PIP_MANYLINUX2010:-0}"
-export TF_VERSION="${TF_VERSION:-1.15.0}"
+export TF_VERSION="${TF_VERSION:-2.3.0}"
 
 if [[ -z "${PYTHON_MINOR_VERSION}" ]]; then
   PYTHON="python${PYTHON_VERSION}"
@@ -33,11 +33,23 @@ else
   PYTHON="python${PYTHON_VERSION}.${PYTHON_MINOR_VERSION}"
 fi
 
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+$PYTHON get-pip.py --user
+
+PIP="$PYTHON -m pip"
+
+${PIP} install --upgrade setuptools --user
+${PIP} install tensorflow-gpu=="${TF_VERSION}" --user
+# Hack. Bazel python runtime is not configured. We need to
+# install tensorflow in order to run TF related python tests in
+# bazel.
+python3 -m pip install --upgrade tensorflow-gpu=="${TF_VERSION}" --user
+
 ./configure.sh
 
 bazel clean
 bazel build ...
-bazel test ... --jobs 1
+bazel test ... --test_output=all
 
 DST_DIR="/tmp/artifacts"
 rm -rf "$DST_DIR" || true
@@ -46,3 +58,4 @@ rm -rf "$DST_DIR" || true
 if [[ "${PIP_MANYLINUX2010}" == "1" ]]; then
   find "$DST_DIR" -name *.whl | xargs ./third_party/auditwheel.sh repair --plat manylinux2010_x86_64 -w "$DST_DIR"
 fi
+

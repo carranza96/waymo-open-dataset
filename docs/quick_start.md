@@ -9,10 +9,56 @@ for a quick demo of the installation and data format.
 
 As a first step, please visit https://www.waymo.com/open to gain access to the Waymo Open Dataset.
 
-## System Requirements
+## Use pre-compiled pip/pip3 packages
+
+We only pre-compiled the package for Python 3.6, 3.7, 3.8. If you need the lib
+for a different python version, follow steps in pip_pkg_scripts to build pip
+package on your own.
+
+``` bash
+pip3 install --upgrade pip
+```
+
+### tf 2.4.0.
+
+``` bash
+pip3 install waymo-open-dataset-tf-2-3-0 --user
+```
+
+### tf 2.3.0.
+
+``` bash
+pip3 install waymo-open-dataset-tf-2-3-0 --user
+```
+
+### tf 2.2.0.
+
+``` bash
+pip3 install waymo-open-dataset-tf-2-2-0 --user
+```
+
+### tf 2.1.0.
+Note available for Python 3.8.
+
+``` bash
+pip3 install waymo-open-dataset-tf-2-1-0 --user
+```
+
+### tf 2.0.0
+Note available for Python 3.8.
+
+``` bash
+pip3 install waymo-open-dataset-tf-2-0-0 --user
+```
+
+## Compile in our docker container
+Follow instructions in [pip_pkg_scripts](../pip_pkg_scripts/README.md).
+
+## Local compilation without docker system requirements
 
 *   g++ 5 or higher.
-*   TensorFlow 1.15.0, 2.0.0, 2.1.0, 2.2.0, 2.3.0
+*   python 3.6, 3.7 with TensorFlow 2.0.0, 2.1.0, 2.2.0, 2.3.0, 2.4.0
+*   python 3.8 with TensorFlow 2.2.0, 2.3.0, 2.4.0
 
 The code has two main parts. One is a utility written in C++ to compute the
 evaluation metrics. The other part is a set of
@@ -21,7 +67,7 @@ training.
 
 First, download the code and enter the base directory.
 ```bash
-git clone https://github.com/waymo-research/waymo-open-dataset.git waymo-od 
+git clone https://github.com/waymo-research/waymo-open-dataset.git waymo-od
 cd waymo-od
 git checkout remotes/origin/master
 ```
@@ -46,8 +92,7 @@ command: `bazel clean`
 ## Metrics Computation
 
 The core metrics library is written in C++, so it can be wrapped in other
-languages or frameworks. It can compute detection metrics (mAP) and tracking
-metrics (MOTA). See more information about the metrics on the
+languages or frameworks. It can compute detection metrics, tracking and motion prediction metrics. See more information about the metrics on the
 [website](https://waymo.com/open/next/).
 
 We provide command line tools and TensorFlow ops to call the detection metrics
@@ -83,10 +128,6 @@ implementation of the op at metrics/python/detection_metrics.py.
 Install NumPy and TensorFlow and reconfigure .bazelrc. `bash pip3 install numpy
 tensorflow ./configure.sh`
 
-We have configured our build system to work with TensorFlow 1.14.0. For a higher
-version, you might need to update the proto version in WORKSPACE to match your
-TensorFlow version.
-
 Run TensorFlow metrics op related tests. They can serve as examples for usage.
 ```bash
 bazel build waymo_open_dataset/metrics/ops/... bazel test
@@ -98,40 +139,14 @@ waymo_open_dataset/metrics/python/...
 
 We provide a set of TensorFlow libraries in the utils directory to help with
 building models. Refer to the
-[Colab tutorial](https://colab.sandbox.google.com/github/waymo-research/waymo-open-dataset/blob/master/tutorial/tutorial.ipynb)
+[Perception Colab tutorial](https://colab.sandbox.google.com/github/waymo-research/waymo-open-dataset/blob/master/tutorial/tutorial.ipynb) and [Motion Prediction tutorial](https://colab.sandbox.google.com/github/waymo-research/waymo-open-dataset/blob/master/tutorial/tutorial_motion.ipynb)
 for examples of their usage.
 
 ```bash
 bazel test waymo_open_dataset/utils/...
 ```
 
-## Use pre-compiled pip/pip3 packages
-
-We only pre-compiled the package for Python 3.6, 3.7, 3.8. If you need the lib
-for a different python version, follow steps in pip_pkg_scripts to build pip
-package on your own. ``` bash pip3 install --upgrade pip
-
-### tf 2.3.0.
-
-pip3 install waymo-open-dataset-tf-2-3-0==1.2.0 --user
-
-### tf 2.2.0.
-
-pip3 install waymo-open-dataset-tf-2-2-0==1.2.0 --user
-
-### tf 2.1.0.
-
-pip3 install waymo-open-dataset-tf-2-1-0==1.2.0 --user
-
-### tf 2.0.0
-
-pip3 install waymo-open-dataset-tf-2-0-0==1.2.0 --user
-
-### tf 1.15.0
-
-pip3 install waymo-open-dataset-tf-1-15-0==1.2.0 --user
-
-## Submit to leaderboard
+## Submit to leaderboard (For Perception tasks only)
 
 1.  Run inference and dump the predictions in protos/metrics.proto:Objects
     format. Example code can be found in
@@ -141,7 +156,9 @@ pip3 install waymo-open-dataset-tf-1-15-0==1.2.0 --user
 
 2.  First modify metrics/tools/submission.txtpb to set the metadata information.
     Then run metrics/tools/create_submission to convert the file above to the
-    submission proto by adding more metadata submission information.
+    submission proto by adding more metadata submission information. NOTE:
+    follow [latency instruction](latency/README.md) to create the docker image
+    and fill in the required fields.
 
 ```bash
 mkdir /tmp/my_model
