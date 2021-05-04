@@ -23,7 +23,7 @@ import tensorflow as tf
 from waymo_open_dataset.utils import transform_utils
 
 __all__ = [
-    'is_within_box_3d', 'compute_num_points_in_box_3d',
+    'is_within_box_3d', 'compute_num_points_in_box_3d', 'is_within_box_2d',
     'get_upright_3d_box_corners', 'transform_point', 'transform_box'
 ]
 
@@ -59,12 +59,57 @@ def is_within_box_3d(point, box, name=None):
     # [N, M, 3]
     point_in_box_frame = tf.einsum('nj,mij->nmi', point, rotation) + translation
     # [N, M, 3]
-    point_in_box = tf.logical_and(point_in_box_frame <= dim * 0.5,
-                                  point_in_box_frame >= -dim * 0.5)
+    point_in_box = tf.logical_and(
+        tf.logical_and(point_in_box_frame <= dim * 0.5,
+                       point_in_box_frame >= -dim * 0.5),
+        tf.reduce_all(tf.not_equal(dim, 0), axis=-1, keepdims=True))
     # [N, M]
     point_in_box = tf.cast(
         tf.reduce_prod(
             input_tensor=tf.cast(point_in_box, dtype=tf.uint8), axis=-1),
+        dtype=tf.bool)
+
+    return point_in_box
+
+
+def is_within_box_2d(point, box):
+  """Checks whether a point is in a BEV box given a set of points and boxes.
+
+  Args:
+    point: [N, 2] tensor. Inner dims are: [x, y].
+    box: [M, 5] tensor. Inner dims are: [center_x, center_y, length, width,
+      heading].
+
+  Returns:
+    point_in_box; [N, M] boolean tensor.
+  """
+
+  with tf.name_scope('IsWithinBox2D'):
+    center = box[:, 0:2]
+    dim = box[:, 2:4]
+    heading = box[:, 4]
+    # [M, 2, 2]
+    rotation = transform_utils.get_yaw_rotation_2d(heading)
+    # [M, 3, 3]
+    transform = transform_utils.get_transform(rotation, center)
+    # [M, 3, 3]
+    transform = tf.linalg.inv(transform)
+    # [M, 2, 2]
+    rotation = transform[:, 0:2, 0:2]
+    # [M, 2]
+    translation = transform[:, 0:2, 2]
+
+    # [N, M, 2]
+    point_in_box_frame = tf.einsum('nj,mij->nmi', point, rotation) + translation
+    # [N, M, 2]
+    point_in_box = tf.logical_and(
+        tf.logical_and(point_in_box_frame <= dim * 0.5,
+                       point_in_box_frame >= -dim * 0.5),
+        tf.reduce_all(tf.not_equal(dim, 0), axis=-1, keepdims=True))
+    # [N, M]
+    point_in_box = tf.cast(
+        tf.reduce_prod(
+            input_tensor=tf.cast(point_in_box, dtype=tf.int32), axis=-1),
         dtype=tf.bool)
 
     return point_in_box
@@ -164,10 +209,9 @@ def transform_box(box, from_frame_pose, to_frame_pose, name=None):
   """
   with tf.compat.v1.name_scope(name, 'TransformBox'):
     transform = tf.linalg.matmul(tf.linalg.inv(to_frame_pose), from_frame_pose)
-    heading = box[..., -1] + tf.atan2(transform[..., 1, 0], transform[..., 0,
-                                                                      0])
+    heading_offset = tf.atan2(transform[..., 1, 0], transform[..., 0, 0])
+    heading = box[..., -1] + heading_offset[..., tf.newaxis]
     center = tf.einsum('...ij,...nj->...ni', transform[..., 0:3, 0:3],
                        box[..., 0:3]) + tf.expand_dims(
                            transform[..., 0:3, 3], axis=-2)
-
     return tf.concat([center, box[..., 3:6], heading[..., tf.newaxis]], axis=-1)
