@@ -24,7 +24,7 @@ LOCAL_EVALUATOR_PATH=$(mktemp)
 cp $LATENCY_EVALUATOR_PATH $LOCAL_EVALUATOR_PATH
 DETECTION_OUTPUT_DIR=$(mktemp -d)
 touch $OUTPUT_LATENCY_FILE
-docker run --rm \
+docker run --rm --gpus all \
   --mount type=bind,source=$LOCAL_EVALUATOR_PATH,dst=/code/evaluator.py,readonly \
   --mount type=bind,source=$DATA_DIR,dst=/eval_data,readonly \
   --mount type=bind,source=$DETECTION_OUTPUT_DIR,dst=/eval_outputs \
